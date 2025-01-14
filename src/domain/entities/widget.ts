@@ -13,12 +13,6 @@ export interface CreateWidgetProps {
   stock: number
 }
 
-export interface WidgetState {
-  name: string
-  description: string
-  stock: number
-}
-
 export class Widget {
   readonly id: string
   name: string
