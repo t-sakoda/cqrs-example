@@ -1,4 +1,6 @@
-export class UpdateWidgetCommand {
+import type {ICommand} from './iCommand'
+
+export class UpdateWidgetCommand implements ICommand {
   constructor(
     public id: string,
     public name?: string,
