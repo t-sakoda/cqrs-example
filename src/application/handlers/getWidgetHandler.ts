@@ -1,9 +1,12 @@
 import type {IWidgetRepository} from '../../domain/repositories/iWidgetRepository'
 import type {GetWidgetCommand} from '../commands/getWidgetCommand'
 import {WidgetDTO} from '../dto/widgetDTO'
+import {CommandHandler} from './commandHandler'
 
-export class GetWidgetHandler {
-  constructor(private widgetRepository: IWidgetRepository) {}
+export class GetWidgetHandler extends CommandHandler<GetWidgetCommand> {
+  constructor(private widgetRepository: IWidgetRepository) {
+    super(widgetRepository)
+  }
 
   async execute(command: GetWidgetCommand): Promise<WidgetDTO> {
     const widget = await this.widgetRepository.findById(command.id)
