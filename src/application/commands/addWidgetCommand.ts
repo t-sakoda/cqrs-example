@@ -1,9 +1,19 @@
+import {Widget} from '../../domain/entities/widget'
+import type {WidgetDTO} from '../dto/widgetDTO'
 import type {ICommand} from './iCommand'
 
-export class AddWidgetCommand implements ICommand {
-  constructor(
-    public name: string,
-    public description: string,
-    public stock: number,
-  ) {}
+export interface AddWidgetCommandInput {
+  name: string
+  description: string
+  stock: number
+}
+
+export interface AddWidgetCommandOutput {
+  output: WidgetDTO
+}
+
+export class AddWidgetCommand
+  implements ICommand<AddWidgetCommandInput, AddWidgetCommandOutput>
+{
+  constructor(readonly input: AddWidgetCommandInput) {}
 }

@@ -1,7 +1,12 @@
 import type {IWidgetRepository} from '../../domain/repositories/iWidgetRepository'
-import type {ICommand} from '../commands/iCommand'
+import type {
+  ICommand,
+  ICommandInput,
+  ICommandOutput,
+} from '../commands/iCommand'
 
-export abstract class CommandHandler<T extends ICommand> {
-  constructor(protected repository: IWidgetRepository) {}
-  abstract execute(command: T): Promise<unknown>
+export abstract class CommandHandler<C extends ICommand<unknown, unknown>> {
+  constructor(protected widgetRepository: IWidgetRepository) {}
+
+  abstract execute(command: C): C extends ICommand<unknown, infer O> ? O : never
 }
