@@ -15,11 +15,8 @@ export class WidgetController {
     stock: number,
   ): Promise<WidgetDTO> {
     const command = new AddWidgetCommand({name, description, stock})
-    const {output} = await this.commandBus.execute<
-      AddWidgetCommandInput,
-      AddWidgetCommandOutput,
-      AddWidgetCommand
-    >(command)
-    return output
+    const result: AddWidgetCommandOutput =
+      await this.commandBus.execute(command)
+    return result.output
   }
 }

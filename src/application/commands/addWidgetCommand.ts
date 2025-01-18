@@ -1,14 +1,14 @@
 import {Widget} from '../../domain/entities/widget'
 import type {WidgetDTO} from '../dto/widgetDTO'
-import type {ICommand} from './iCommand'
+import type {ICommand, ICommandInput, ICommandOutput} from './iCommand'
 
-export interface AddWidgetCommandInput {
+export interface AddWidgetCommandInput extends ICommandInput {
   name: string
   description: string
   stock: number
 }
 
-export interface AddWidgetCommandOutput {
+export interface AddWidgetCommandOutput extends ICommandOutput {
   output: WidgetDTO
 }
 

@@ -6,11 +6,11 @@ import type {
 } from '../commands/iCommand'
 
 export abstract class CommandHandler<
-  I extends ICommandInput,
-  O extends ICommandOutput,
   C extends ICommand<I, O>,
+  I extends ICommandInput = C extends ICommand<infer I, infer O> ? I : never,
+  O extends ICommandOutput = C extends ICommand<infer I, infer O> ? O : never,
 > {
   constructor(protected widgetRepository: IWidgetRepository) {}
 
-  abstract execute(command: C): C extends ICommand<unknown, infer O> ? O : never
+  abstract execute(command: C): O | Promise<O>
 }
