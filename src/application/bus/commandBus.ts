@@ -8,22 +8,32 @@ import type {CommandHandler} from '../handlers/commandHandler'
 export class CommandBus {
   private handlers = new Map<
     string,
-    CommandHandler<ICommand<ICommandInput, ICommandOutput>>
+    CommandHandler<
+      ICommandInput,
+      ICommandOutput,
+      ICommand<ICommandInput, ICommandOutput>
+    >
   >()
 
-  register<C extends ICommand<ICommandInput, ICommandOutput>>(
+  register<
+    I extends ICommandInput,
+    O extends ICommandOutput,
+    C extends ICommand<I, O>,
+  >(
     commandType: new (input: unknown) => C,
-    handler: CommandHandler<C>,
+    handler: CommandHandler<I, O, C>,
   ): void {
     this.handlers.set(commandType.name, handler)
   }
 
-  execute<C extends ICommand<unknown, ICommandOutput>>(
-    command: C,
-  ): C extends ICommand<unknown, infer O> ? O : never {
+  execute<
+    I extends ICommandInput,
+    O extends ICommandOutput,
+    C extends ICommand<I, O>,
+  >(command: C): O | Promise<O> {
     const handler = this.handlers.get(
       command.constructor.name,
-    ) as CommandHandler<C>
+    ) as CommandHandler<I, O, C>
     if (!handler) {
       throw new Error(
         `Handler not found for command: ${command.constructor.name}`,

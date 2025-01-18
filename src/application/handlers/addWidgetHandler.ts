@@ -1,12 +1,17 @@
 import {Widget} from '../../domain/entities/widget'
 import type {
   AddWidgetCommand,
+  AddWidgetCommandInput,
   AddWidgetCommandOutput,
 } from '../commands/addWidgetCommand'
 import {WidgetDTO} from '../dto/widgetDTO'
 import {CommandHandler} from './commandHandler'
 
-export class AddWidgetHandler extends CommandHandler<AddWidgetCommand> {
+export class AddWidgetHandler extends CommandHandler<
+  AddWidgetCommandInput,
+  AddWidgetCommandOutput,
+  AddWidgetCommand
+> {
   async execute(command: AddWidgetCommand): Promise<AddWidgetCommandOutput> {
     const widget = Widget.create(command.input)
 
