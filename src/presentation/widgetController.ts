@@ -5,6 +5,7 @@ import {
   ListWidgetCommand,
   type ListWidgetCommandInput,
 } from '../application/commands/listWidgetCommand'
+import {RemoveWidgetCommand} from '../application/commands/removeWidgetCommand'
 import type {WidgetDTO} from '../application/dto/widgetDTO'
 
 export class WidgetController {
@@ -30,5 +31,11 @@ export class WidgetController {
     const command = new ListWidgetCommand({})
     const result = await this.commandBus.execute(command)
     return result.output
+  }
+
+  async removeWidget(id: string): Promise<void> {
+    const command = new RemoveWidgetCommand({id})
+    const result = await this.commandBus.execute(command)
+    console.debug('Remove:', result)
   }
 }
