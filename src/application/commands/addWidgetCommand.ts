@@ -1,4 +1,3 @@
-import {Widget} from '../../domain/entities/widget'
 import type {WidgetDTO} from '../dto/widgetDTO'
 import type {ICommand, ICommandInput, ICommandOutput} from './iCommand'
 
@@ -15,5 +14,15 @@ export interface AddWidgetCommandOutput extends ICommandOutput {
 export class AddWidgetCommand
   implements ICommand<AddWidgetCommandInput, AddWidgetCommandOutput>
 {
-  constructor(readonly input: AddWidgetCommandInput) {}
+  readonly input: AddWidgetCommandInput
+
+  constructor(input: AddWidgetCommandInput) {
+    this.input = input
+  }
+
+  getOutputType(): AddWidgetCommandOutput {
+    throw new Error(
+      'This method is for type inference only and should not be called.',
+    )
+  }
 }

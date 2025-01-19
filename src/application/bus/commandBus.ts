@@ -11,8 +11,8 @@ export class CommandBus {
 
   register<
     C extends ICommand<I, O>,
-    I extends ICommandInput,
-    O extends ICommandOutput,
+    I extends ICommandInput = C extends ICommand<infer I, infer O> ? I : never,
+    O extends ICommandOutput = C extends ICommand<I, infer O> ? O : never,
   >(commandType: new (input: I) => C, handler: CommandHandler<C, I, O>): void {
     this.handlers.set(commandType.name, handler)
   }
