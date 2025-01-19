@@ -1,9 +1,6 @@
 import type {CommandBus} from '../application/bus/commandBus'
-import {
-  AddWidgetCommand,
-  type AddWidgetCommandInput,
-  type AddWidgetCommandOutput,
-} from '../application/commands/addWidgetCommand'
+import {AddWidgetCommand} from '../application/commands/addWidgetCommand'
+import {GetWidgetCommand} from '../application/commands/getWidgetCommand'
 import type {WidgetDTO} from '../application/dto/widgetDTO'
 
 export class WidgetController {
@@ -15,6 +12,12 @@ export class WidgetController {
     stock: number,
   ): Promise<WidgetDTO> {
     const command = new AddWidgetCommand({name, description, stock})
+    const result = await this.commandBus.execute(command)
+    return result.output
+  }
+
+  async getWidget(id: string): Promise<WidgetDTO> {
+    const command = new GetWidgetCommand({id})
     const result = await this.commandBus.execute(command)
     return result.output
   }
