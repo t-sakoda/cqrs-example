@@ -1,34 +1,37 @@
 import type {IWidgetRepository} from '../../domain/repositories/iWidgetRepository'
-import type {UpdateWidgetCommand} from '../commands/updateWidgetCommand'
+import type {
+  UpdateWidgetCommand,
+  UpdateWidgetCommandOutput,
+} from '../commands/updateWidgetCommand'
 import {WidgetDTO} from '../dto/widgetDTO'
 import {CommandHandler} from './commandHandler'
 
 export class UpdateWidgetHandler extends CommandHandler<UpdateWidgetCommand> {
-  constructor(private widgetRepository: IWidgetRepository) {
-    super(widgetRepository)
-  }
-
-  async execute(command: UpdateWidgetCommand): Promise<WidgetDTO> {
-    const widget = await this.widgetRepository.findById(command.id)
+  async execute(
+    command: UpdateWidgetCommand,
+  ): Promise<UpdateWidgetCommandOutput> {
+    const {input} = command
+    const widget = await this.widgetRepository.findById(input.id)
 
     if (!widget) {
       throw new Error('Widget not found')
     }
 
-    if (command.name) {
-      widget.name = command.name
+    if (input.name) {
+      widget.name = input.name
     }
 
-    if (command.description) {
-      widget.description = command.description
+    if (input.description) {
+      widget.description = input.description
     }
 
-    if (command.stock) {
-      widget.stock = command.stock
+    if (input.stock) {
+      widget.stock = input.stock
     }
 
     await this.widgetRepository.save(widget)
 
-    return WidgetDTO.fromDomain(widget)
+    const output = WidgetDTO.fromDomain(widget)
+    return {output}
   }
 }
