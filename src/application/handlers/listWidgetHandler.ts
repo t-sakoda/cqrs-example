@@ -1,4 +1,3 @@
-import type {IWidgetRepository} from '../../domain/repositories/iWidgetRepository'
 import type {
   ListWidgetCommand,
   ListWidgetCommandOutput,
