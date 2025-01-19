@@ -1,15 +1,15 @@
 import type {IWidgetRepository} from '../../domain/repositories/iWidgetRepository'
-import type {ListWidgetCommand} from '../commands/listWidgetCommand'
+import type {
+  ListWidgetCommand,
+  ListWidgetCommandOutput,
+} from '../commands/listWidgetCommand'
 import {WidgetDTO} from '../dto/widgetDTO'
 import {CommandHandler} from './commandHandler'
 
 export class ListWidgetHandler extends CommandHandler<ListWidgetCommand> {
-  constructor(private widgetRepository: IWidgetRepository) {
-    super(widgetRepository)
-  }
-
-  async execute(): Promise<WidgetDTO[]> {
+  async execute(): Promise<ListWidgetCommandOutput> {
     const widgets = await this.widgetRepository.findAll()
-    return widgets.map(WidgetDTO.fromDomain)
+    const output = widgets.map(WidgetDTO.fromDomain)
+    return {output}
   }
 }
