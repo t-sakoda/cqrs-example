@@ -6,8 +6,10 @@ import type {
 import type {CommandHandler} from '../handlers/commandHandler'
 
 export class CommandBus {
-  // biome-ignore lint/suspicious/noExplicitAny: Any is used to define a contract for a command.
-  private handlers = new Map<string, CommandHandler<any>>()
+  private handlers = new Map<
+    string,
+    CommandHandler<ICommand<ICommandInput, ICommandOutput>>
+  >()
 
   register<
     C extends ICommand<I, O>,

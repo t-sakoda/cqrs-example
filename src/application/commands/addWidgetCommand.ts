@@ -14,11 +14,7 @@ export interface AddWidgetCommandOutput extends ICommandOutput {
 export class AddWidgetCommand
   implements ICommand<AddWidgetCommandInput, AddWidgetCommandOutput>
 {
-  readonly input: AddWidgetCommandInput
-
-  constructor(input: AddWidgetCommandInput) {
-    this.input = input
-  }
+  constructor(public readonly input: AddWidgetCommandInput) {}
 
   getOutputType(): AddWidgetCommandOutput {
     throw new Error(
