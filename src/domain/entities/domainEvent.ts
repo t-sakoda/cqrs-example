@@ -1,8 +1,17 @@
+export const DomainEventName = {
+  WidgetCreated: 'WidgetCreated',
+  WidgetNameChanged: 'WidgetNameChanged',
+  WidgetDescriptionChanged: 'WidgetDescriptionChanged',
+  WidgetDeleted: 'WidgetDeleted',
+} as const
+export type DomainEventName =
+  (typeof DomainEventName)[keyof typeof DomainEventName]
+
 export interface DomainEventProps {
   aggregateId: string
   version: number
   createdAt: string
-  name: string
+  name: DomainEventName
   payload: any
 }
 
@@ -10,7 +19,7 @@ export class DomainEvent {
   public readonly aggregateId: string
   public readonly version: number
   public readonly createdAt: string
-  public readonly name: string
+  public readonly name: DomainEventName
   public readonly payload: any
 
   constructor(props: DomainEventProps) {
