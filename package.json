@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Build a CQRS event store with Amazon DynamoDB",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "format": "biome check --write",
     "test": "vitest"
@@ -15,10 +16,16 @@
     "@types/node": "22.10.7",
     "ts-node": "10.9.2",
     "typescript": "5.7.3",
-    "vitest": "2.1.8"
+    "vitest": "2.1.8",
+    "vitest-dynamodb-lite": "3.1.1"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.731.1",
     "@aws-sdk/lib-dynamodb": "3.731.1"
+  },
+  "overrides": {
+    "vitest-dynamodb-lite": {
+      "vitest": "2.x"
+    }
   }
 }
