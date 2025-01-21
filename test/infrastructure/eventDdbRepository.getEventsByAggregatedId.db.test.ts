@@ -1,5 +1,4 @@
 import {randomUUID} from 'node:crypto'
-import {Delete} from '@aws-sdk/client-dynamodb'
 import {
   BatchWriteCommand,
   type BatchWriteCommandInput,
