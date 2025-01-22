@@ -60,7 +60,6 @@ describe('EventDdbRepository.getEventsByAggregateId', () => {
     })
     it('returns an array of events', async () => {
       const repository = new EventDdbRepository()
-      await repository.saveEvent(event)
       const result = await repository.getEventsByAggregateId(event.aggregateId)
       expect(result).toEqual([event])
     })
