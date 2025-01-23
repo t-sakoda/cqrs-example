@@ -1,0 +1,38 @@
+import {
+  toHaveReceivedAnyCommand,
+  toHaveReceivedCommand,
+  toHaveReceivedCommandExactlyOnceWith,
+  toHaveReceivedCommandOnce,
+  toHaveReceivedCommandTimes,
+  toHaveReceivedCommandWith,
+  toHaveReceivedLastCommandWith,
+  toHaveReceivedNthCommandWith,
+  toReceiveAnyCommand,
+  toReceiveCommand,
+  toReceiveCommandExactlyOnceWith,
+  toReceiveCommandOnce,
+  toReceiveCommandTimes,
+  toReceiveCommandWith,
+  toReceiveLastCommandWith,
+  toReceiveNthCommandWith,
+} from 'aws-sdk-client-mock-vitest'
+import {expect} from 'vitest'
+
+expect.extend({
+  toReceiveCommandTimes,
+  toHaveReceivedCommandTimes,
+  toReceiveCommandOnce,
+  toHaveReceivedCommandOnce,
+  toReceiveCommand,
+  toHaveReceivedCommand,
+  toReceiveCommandWith,
+  toHaveReceivedCommandWith,
+  toReceiveNthCommandWith,
+  toHaveReceivedNthCommandWith,
+  toReceiveLastCommandWith,
+  toHaveReceivedLastCommandWith,
+  toReceiveAnyCommand,
+  toHaveReceivedAnyCommand,
+  toReceiveCommandExactlyOnceWith,
+  toHaveReceivedCommandExactlyOnceWith,
+})
