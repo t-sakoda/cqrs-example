@@ -20,13 +20,14 @@ describe('EventDdbRepository.saveEvent', () => {
     ddbMock.reset()
   })
   describe('Given an event does not exist', () => {
+    const aggregateId = randomUUID()
     beforeEach(() => {
       ddbMock.on(QueryCommand).resolves({})
       ddbMock.on(PutCommand).resolves({})
     })
     it('saves the event', async () => {
       const event = new DomainEvent({
-        aggregateId: randomUUID(),
+        aggregateId,
         createdAt: new Date('2025-01-01T12:34:56.789Z').toISOString(),
         name: DomainEventName.WidgetCreated,
         payload: {name: 'WidgetCreated'},
