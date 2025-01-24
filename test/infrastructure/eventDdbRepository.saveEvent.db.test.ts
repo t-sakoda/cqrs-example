@@ -1,6 +1,8 @@
 import {randomUUID} from 'node:crypto'
 import {ConditionalCheckFailedException} from '@aws-sdk/client-dynamodb'
 import {
+  BatchWriteCommand,
+  type BatchWriteCommandInput,
   DeleteCommand,
   type DeleteCommandInput,
   PutCommand,
@@ -100,7 +102,7 @@ describe('EventDdbRepository.saveEvent', () => {
     })
     it('does not save the event', async () => {
       const repository = new EventDdbRepository()
-      await expect(repository.saveEvent(event)).rejects.toThrowError(
+      await expect(repository.saveEvent(event)).rejects.toThrow(
         EventRepositoryErrorCode.EventAlreadyExists,
       )
     })
@@ -152,16 +154,17 @@ describe('EventDdbRepository.saveEvent', () => {
     })
   })
 
-  describe('Given an event with a smaller version than the existing event is provided', () => {
-    const eventVersion2 = new DomainEvent({
-      aggregateId: randomUUID(),
+  describe('Given an event with the same version as the existing event is provided', () => {
+    const aggregateId = randomUUID()
+    const eventVersion1 = new DomainEvent({
+      aggregateId,
       createdAt: new Date('2025-01-01T12:34:56.789Z').toISOString(),
       name: DomainEventName.WidgetCreated,
       payload: {name: 'WidgetCreated'},
-      version: 2,
+      version: 1,
     })
-    const eventVersion1 = new DomainEvent({
-      aggregateId: eventVersion2.aggregateId,
+    const eventVersion1Duplicate = new DomainEvent({
+      aggregateId,
       createdAt: new Date('2025-01-02T12:34:57.789Z').toISOString(),
       name: DomainEventName.WidgetNameChanged,
       payload: {name: 'WidgetNameChanged'},
@@ -171,11 +174,11 @@ describe('EventDdbRepository.saveEvent', () => {
       const input: PutCommandInput = {
         TableName: TABLE_NAME,
         Item: {
-          PK: eventVersion2.aggregateId,
-          SK: eventVersion2.version,
-          created: eventVersion2.createdAt,
-          name: eventVersion2.name,
-          payload: eventVersion2.payload,
+          PK: eventVersion1.aggregateId,
+          SK: eventVersion1.version,
+          created: eventVersion1.createdAt,
+          name: eventVersion1.name,
+          payload: eventVersion1.payload,
         },
       }
       const command = new PutCommand(input)
@@ -185,8 +188,8 @@ describe('EventDdbRepository.saveEvent', () => {
       const input: DeleteCommandInput = {
         TableName: TABLE_NAME,
         Key: {
-          PK: eventVersion2.aggregateId,
-          SK: eventVersion2.version,
+          PK: eventVersion1.aggregateId,
+          SK: eventVersion1.version,
         },
       }
       const command = new DeleteCommand(input)
@@ -194,7 +197,67 @@ describe('EventDdbRepository.saveEvent', () => {
     })
     it('does not save the event', async () => {
       const repository = new EventDdbRepository()
-      await expect(repository.saveEvent(eventVersion1)).rejects.toThrowError(
+      await expect(
+        repository.saveEvent(eventVersion1Duplicate),
+      ).rejects.toThrow(EventRepositoryErrorCode.EventAlreadyExists)
+    })
+  })
+
+  describe('Given an event with a smaller version than the existing event is provided', () => {
+    const aggregateId = randomUUID()
+    const eventVersion2 = new DomainEvent({
+      aggregateId,
+      createdAt: new Date('2025-01-01T12:34:56.789Z').toISOString(),
+      name: DomainEventName.WidgetCreated,
+      payload: {name: 'WidgetCreated'},
+      version: 2,
+    })
+    const eventVersion1 = new DomainEvent({
+      aggregateId,
+      createdAt: new Date('2025-01-02T12:34:57.789Z').toISOString(),
+      name: DomainEventName.WidgetNameChanged,
+      payload: {name: 'WidgetNameChanged'},
+      version: 1,
+    })
+    const events = [eventVersion2]
+    beforeEach(async () => {
+      const input: BatchWriteCommandInput = {
+        RequestItems: {
+          [TABLE_NAME]: events.map((event) => ({
+            PutRequest: {
+              Item: {
+                PK: event.aggregateId,
+                SK: event.version,
+                created: event.createdAt,
+                name: event.name,
+                payload: event.payload,
+              },
+            },
+          })),
+        },
+      }
+      const command = new BatchWriteCommand(input)
+      await ddbDocClient.send(command)
+    })
+    afterEach(async () => {
+      const input: BatchWriteCommandInput = {
+        RequestItems: {
+          [TABLE_NAME]: events.map((event) => ({
+            DeleteRequest: {
+              Key: {
+                PK: event.aggregateId,
+                SK: event.version,
+              },
+            },
+          })),
+        },
+      }
+      const command = new BatchWriteCommand(input)
+      await ddbDocClient.send(command)
+    })
+    it('does not save the event', async () => {
+      const repository = new EventDdbRepository()
+      await expect(repository.saveEvent(eventVersion1)).rejects.toThrow(
         EventRepositoryErrorCode.EventAlreadyExists,
       )
     })

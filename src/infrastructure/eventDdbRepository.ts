@@ -67,8 +67,10 @@ export class EventDdbRepository implements IEventRepository {
         name: event.name,
         payload: event.payload,
       },
-      ConditionExpression:
-        'attribute_not_exists(PK) AND attribute_not_exists(SK)',
+      ConditionExpression: 'attribute_not_exists(PK) OR SK < :newVersion',
+      ExpressionAttributeValues: {
+        ':newVersion': event.version,
+      },
     }
     const command = new PutCommand(input)
     await this.ddbDocClient.send(command)
