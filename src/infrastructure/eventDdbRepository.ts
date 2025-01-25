@@ -1,7 +1,6 @@
 import {Domain} from 'node:domain'
 import {
   type DynamoDBDocument,
-  type DynamoDBDocumentClient,
   PutCommand,
   type PutCommandInput,
   QueryCommand,
