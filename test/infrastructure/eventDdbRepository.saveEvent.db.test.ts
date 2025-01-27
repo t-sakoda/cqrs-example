@@ -103,7 +103,7 @@ describe('EventDdbRepository.saveEvent', () => {
     it('does not save the event', async () => {
       const repository = new EventDdbRepository()
       await expect(repository.saveEvent(event)).rejects.toThrow(
-        EventRepositoryErrorCode.EventAlreadyExists,
+        ConditionalCheckFailedException,
       )
     })
   })
@@ -199,7 +199,7 @@ describe('EventDdbRepository.saveEvent', () => {
       const repository = new EventDdbRepository()
       await expect(
         repository.saveEvent(eventVersion1Duplicate),
-      ).rejects.toThrow(EventRepositoryErrorCode.EventAlreadyExists)
+      ).rejects.toThrow(ConditionalCheckFailedException)
     })
   })
 
@@ -255,11 +255,9 @@ describe('EventDdbRepository.saveEvent', () => {
       const command = new BatchWriteCommand(input)
       await ddbDocClient.send(command)
     })
-    it('does not save the event', async () => {
+    it('saves the event', async () => {
       const repository = new EventDdbRepository()
-      await expect(repository.saveEvent(eventVersion1)).rejects.toThrow(
-        EventRepositoryErrorCode.EventAlreadyExists,
-      )
+      await expect(repository.saveEvent(eventVersion1)).resolves.toBeUndefined()
     })
   })
 })

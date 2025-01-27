@@ -24,12 +24,16 @@ export class EventDdbRepository implements IEventRepository {
     this.ddbDocClient = ddbDocClient
   }
 
-  async getEventsByAggregateId(aggregateId: string): Promise<DomainEvent[]> {
+  async getEventsByAggregateId(
+    aggregateId: string,
+    version = 0,
+  ): Promise<DomainEvent[]> {
     const input: QueryCommandInput = {
       TableName: this.tableName,
-      KeyConditionExpression: 'PK = :aggregateId',
+      KeyConditionExpression: 'PK = :aggregateId AND SK >= :version',
       ExpressionAttributeValues: {
         ':aggregateId': aggregateId,
+        ':version': version,
       },
     }
     const command = new QueryCommand(input)
@@ -52,11 +56,6 @@ export class EventDdbRepository implements IEventRepository {
   }
 
   async saveEvent(event: DomainEvent): Promise<void> {
-    const existingEvents = await this.getEventsByAggregateId(event.aggregateId)
-    if (existingEvents.some((e) => e.version >= event.version)) {
-      throw new Error(EventRepositoryErrorCode.EventAlreadyExists)
-    }
-
     const input: PutCommandInput = {
       TableName: this.tableName,
       Item: {
@@ -66,10 +65,8 @@ export class EventDdbRepository implements IEventRepository {
         name: event.name,
         payload: event.payload,
       },
-      ConditionExpression: 'attribute_not_exists(PK) OR SK < :newVersion',
-      ExpressionAttributeValues: {
-        ':newVersion': event.version,
-      },
+      ConditionExpression:
+        'attribute_not_exists(PK) AND attribute_not_exists(SK)',
     }
     const command = new PutCommand(input)
     await this.ddbDocClient.send(command)

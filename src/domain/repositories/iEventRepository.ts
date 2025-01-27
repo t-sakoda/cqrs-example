@@ -7,6 +7,9 @@ export type EventRepositoryErrorCode =
   (typeof EventRepositoryErrorCode)[keyof typeof EventRepositoryErrorCode]
 
 export interface IEventRepository {
-  getEventsByAggregateId(aggregateId: string): Promise<DomainEvent[]>
+  getEventsByAggregateId(
+    aggregateId: string,
+    version: number,
+  ): Promise<DomainEvent[]>
   saveEvent(event: DomainEvent): Promise<void>
 }
