@@ -1,5 +1,12 @@
-import {DomainEvent, DomainEventName} from './domainEvent'
+import {type DomainEvent, DomainEventName} from './domainEvent'
 import type {Snapshot} from './snapshot'
+
+export const WidgetError = {
+  AggregateIdNotSet: 'AggregateIdNotSet',
+  AggregateIdAlreadySet: 'AggregateIdAlreadySet',
+  AggregateIdMismatch: 'AggregateIdMismatch',
+} as const
+export type WidgetError = (typeof WidgetError)[keyof typeof WidgetError]
 
 export class Widget {
   private _aggregateId?: string
@@ -28,25 +35,24 @@ export class Widget {
     return this._stock
   }
 
-  static fromSnapshot(snapshot: Snapshot) {
-    const widget = new Widget()
-    widget.applyEvent(
-      new DomainEvent({
-        aggregateId: snapshot.aggregateId,
-        version: 0,
-        createdAt: snapshot.payload.createdAt,
-        name: DomainEventName.WidgetCreated,
-        payload: {
-          name: snapshot.payload.name,
-          description: snapshot.payload.description,
-          stock: snapshot.payload.stock,
-        },
-      }),
-    )
-    return widget
+  applySnapshot(snapshot: Snapshot) {
+    if (this._aggregateId) {
+      throw new Error(WidgetError.AggregateIdAlreadySet)
+    }
+    this._aggregateId = snapshot.aggregateId
+    this._createdAt = snapshot.payload.createdAt
+    this._name = snapshot.payload.name
+    this._description = snapshot.payload.description
+    this._stock = snapshot.payload.stock
   }
 
   applyEvent(event: DomainEvent) {
+    if (!this._aggregateId) {
+      throw new Error(WidgetError.AggregateIdNotSet)
+    }
+    if (this._aggregateId !== event.aggregateId) {
+      throw new Error(WidgetError.AggregateIdMismatch)
+    }
     switch (event.name) {
       case DomainEventName.WidgetCreated:
         this._aggregateId = event.aggregateId

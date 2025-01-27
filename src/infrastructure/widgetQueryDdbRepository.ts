@@ -70,7 +70,7 @@ export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
       )
     }
 
-    let widget: Widget
+    const widget = new Widget()
 
     // Snapshotテーブルから最新のスナップショットを取得
     let snapshot: Snapshot | undefined
@@ -84,20 +84,9 @@ export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
         throw error
       }
     }
+    // スナップショットから復元
     if (snapshot) {
-      // スナップショットから復元
-      widget = new Widget({
-        aggregateId,
-        createdAt: snapshot.payload.createdAt,
-        name: snapshot.payload.name,
-        description: snapshot.payload.description,
-        stock: snapshot.payload.stock,
-      })
-    } else {
-      // スナップショットが存在しない場合は新規作成
-      widget = new Widget({
-        aggregateId,
-      })
+      widget.applySnapshot(snapshot)
     }
 
     // Eventテーブルから最新のスナップショットとの差分のイベントを再生
