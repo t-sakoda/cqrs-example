@@ -2,6 +2,7 @@ export const DomainEventName = {
   WidgetCreated: 'WidgetCreated',
   WidgetNameChanged: 'WidgetNameChanged',
   WidgetDescriptionChanged: 'WidgetDescriptionChanged',
+  WidgetStockUpdated: 'WidgetStockUpdated',
   WidgetDeleted: 'WidgetDeleted',
 } as const
 export type DomainEventName =
