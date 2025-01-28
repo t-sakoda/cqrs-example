@@ -1,4 +1,4 @@
-import {Get, ResourceNotFoundException} from '@aws-sdk/client-dynamodb'
+import {ResourceNotFoundException} from '@aws-sdk/client-dynamodb'
 import {
   type DynamoDBDocument,
   GetCommand,
@@ -12,15 +12,15 @@ import {WidgetDTO} from '../application/dto/widgetDTO'
 import {DomainEvent, type DomainEventName} from '../domain/entities/domainEvent'
 import type {Snapshot} from '../domain/entities/snapshot'
 import {Widget} from '../domain/entities/widget'
-import {
-  AggregateQueryRepositoryErrorCode,
-  type IAggregateQueryRepository,
-} from '../domain/repositories/iAggregateQueryRepository'
 import type {IEventRepository} from '../domain/repositories/iEventRepository'
 import {
   type ISnapshotRepository,
   SnapshotRepositoryErrorCode,
 } from '../domain/repositories/iSnapshotRepository'
+import {
+  type IWidgetQueryRepository,
+  WidgetQueryRepositoryErrorCode,
+} from '../domain/repositories/iWidgetQueryRepository'
 import {ddbDocClient} from './ddbDocClient'
 
 const TABLE_NAME = 'Aggregate'
@@ -30,7 +30,7 @@ export interface WidgetQueryDdbRepositoryProps {
   snapshotRepository: ISnapshotRepository
 }
 
-export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
+export class WidgetQueryDdbRepository implements IWidgetQueryRepository {
   private readonly eventRepository: IEventRepository
   private readonly snapshotRepository: ISnapshotRepository
   private readonly tableName: string
@@ -70,7 +70,9 @@ export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
       )
     }
 
-    const widget = new Widget()
+    const widget = new Widget({
+      aggregateId,
+    })
 
     // Snapshotテーブルから最新のスナップショットを取得
     let snapshot: Snapshot | undefined
@@ -99,7 +101,7 @@ export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
     } catch (error) {
       if (
         !(error instanceof Error) ||
-        error.message !== AggregateQueryRepositoryErrorCode.AggregateNotFound
+        error.message !== WidgetQueryRepositoryErrorCode.WidgetNotFound
       ) {
         throw error
       }
@@ -126,13 +128,13 @@ export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
       result = await this.ddbDocClient.send(command)
     } catch (error) {
       if (error instanceof ResourceNotFoundException) {
-        throw new Error(AggregateQueryRepositoryErrorCode.AggregateNotFound)
+        throw new Error(WidgetQueryRepositoryErrorCode.WidgetNotFound)
       }
-      throw new Error(AggregateQueryRepositoryErrorCode.InternalError)
+      throw new Error(WidgetQueryRepositoryErrorCode.InternalError)
     }
 
     if (!result.Item) {
-      throw new Error(AggregateQueryRepositoryErrorCode.AggregateNotFound)
+      throw new Error(WidgetQueryRepositoryErrorCode.WidgetNotFound)
     }
 
     return this.fromItemToDTO(result.Item)
@@ -147,7 +149,7 @@ export class WidgetQueryDdbRepository implements IAggregateQueryRepository {
     try {
       result = await this.ddbDocClient.send(command)
     } catch (error) {
-      throw new Error(AggregateQueryRepositoryErrorCode.InternalError)
+      throw new Error(WidgetQueryRepositoryErrorCode.InternalError)
     }
 
     const {Items: items} = result
