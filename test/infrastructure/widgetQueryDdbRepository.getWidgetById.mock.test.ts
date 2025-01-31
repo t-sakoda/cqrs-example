@@ -43,4 +43,15 @@ describe('WidgetQueryDdbRepository.getWidgetById', () => {
       )
     })
   })
+  describe('Given an error when getting the widget aggregate', () => {
+    const aggregateId = randomUUID()
+    beforeEach(() => {
+      ddbMock.on(GetCommand).rejects(new Error('Unknown error'))
+    })
+    it('throws AggregateNotFound error', async () => {
+      await expect(repository.getWidgetById(aggregateId)).rejects.toThrow(
+        WidgetQueryRepositoryErrorCode.InternalError,
+      )
+    })
+  })
 })
