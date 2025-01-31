@@ -8,8 +8,6 @@ import {mockClient} from 'aws-sdk-client-mock'
 import {SnapshotRepositoryErrorCode} from '../../src/domain/repositories/iSnapshotRepository'
 import {SnapshotDdbRepository} from '../../src/infrastructure/snapshotDdbRepository'
 
-const TABLE_NAME = 'Snapshot'
-
 const ddbMock = mockClient(DynamoDBDocumentClient)
 
 describe('SnapshotDdbRepository.save', () => {
