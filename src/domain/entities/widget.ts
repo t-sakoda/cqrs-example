@@ -43,7 +43,7 @@ export class Widget {
     if (this.aggregateId !== snapshot.aggregateId) {
       throw new Error(WidgetError.AggregateIdMismatch)
     }
-    this._createdAt = snapshot.payload.createdAt
+    this._createdAt = snapshot.payload.created
     this._name = snapshot.payload.name
     this._description = snapshot.payload.description
     this._stock = snapshot.payload.stock

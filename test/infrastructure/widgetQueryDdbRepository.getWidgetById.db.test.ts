@@ -1,6 +1,11 @@
 import {randomUUID} from 'node:crypto'
 import {Delete} from '@aws-sdk/client-dynamodb'
-import {PutCommand, type PutCommandInput} from '@aws-sdk/lib-dynamodb'
+import {
+  BatchWriteCommand,
+  type BatchWriteCommandInput,
+  PutCommand,
+  type PutCommandInput,
+} from '@aws-sdk/lib-dynamodb'
 import {AggregateType} from '../../src/domain/entities/aggregate'
 import {DomainEventName} from '../../src/domain/entities/domainEvent'
 import {WidgetQueryRepositoryErrorCode} from '../../src/domain/repositories/iWidgetQueryRepository'
@@ -59,6 +64,74 @@ describe('WidgetQueryDdbRepository.getWidgetById.db', () => {
         aggregateId,
         createdAt,
         name: 'Widget 1',
+        description: 'Description 1',
+        stock: 10,
+        type: AggregateType.Widget,
+      })
+    })
+  })
+
+  describe('Given a widget aggregate with a snapshot', () => {
+    const aggregateId = randomUUID()
+    const createdAt1 = new Date('2025-01-01T12:34:56.789Z').toISOString()
+    const createdAt2 = new Date('2025-01-02T12:34:56.789Z').toISOString()
+    const createdAt3 = new Date('2025-01-02T12:34:56.789Z').toISOString()
+    beforeEach(() => {
+      const input: BatchWriteCommandInput = {
+        RequestItems: {
+          Aggregate: [
+            {
+              PutRequest: {
+                Item: {
+                  PK: aggregateId,
+                  created: createdAt1,
+                  type: AggregateType.Widget,
+                  lastEvents: {
+                    1: {
+                      createdAt: createdAt3,
+                      name: DomainEventName.WidgetNameChanged,
+                      payload: {
+                        name: 'Widget One',
+                        description: 'Description 1',
+                        stock: 10,
+                      },
+                    },
+                  },
+                  version: 1,
+                },
+              },
+            },
+          ],
+          Snapshot: [
+            {
+              PutRequest: {
+                Item: {
+                  PK: aggregateId,
+                  SK: 1,
+                  created: createdAt2,
+                  payload: {
+                    created: createdAt1,
+                    name: 'Widget 1',
+                    description: 'Description 1',
+                    stock: 10,
+                    type: AggregateType.Widget,
+                  },
+                  event_number: 1,
+                },
+              },
+            },
+          ],
+        },
+      }
+      const command = new BatchWriteCommand(input)
+      return ddbDocClient.send(command)
+    })
+    it('returns the widget DTO', async () => {
+      const widget = await widgetQueryRepository.getWidgetById(aggregateId)
+      expect(widget).toEqual({
+        aggregateId,
+        createdAt: createdAt1,
+        name: 'Widget One',
         description: 'Description 1',
         stock: 10,
         type: AggregateType.Widget,
