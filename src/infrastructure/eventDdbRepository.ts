@@ -1,4 +1,3 @@
-import {Domain} from 'node:domain'
 import {
   type DynamoDBDocument,
   PutCommand,
@@ -7,10 +6,7 @@ import {
   type QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb'
 import {DomainEvent} from '../domain/entities/domainEvent'
-import {
-  EventRepositoryErrorCode,
-  type IEventRepository,
-} from '../domain/repositories/iEventRepository'
+import type {IEventRepository} from '../domain/repositories/iEventRepository'
 import {ddbDocClient} from './ddbDocClient'
 
 const TABLE_NAME = 'Event'
