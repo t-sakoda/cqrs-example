@@ -43,7 +43,7 @@ describe('WidgetQueryDdbRepository.listWidgets', () => {
             PK: aggregateId1,
             created: new Date('2022-01-01T00:00:00.000Z').toISOString(),
             type: AggregateType.Widget,
-            lastEvents: {
+            last_events: {
               1: {
                 created: new Date('2022-01-01T00:00:00.000Z').toISOString(),
                 name: DomainEventName.WidgetCreated,
@@ -60,7 +60,7 @@ describe('WidgetQueryDdbRepository.listWidgets', () => {
             PK: aggregateId2,
             created: new Date('2022-01-02T00:00:00.000Z').toISOString(),
             type: AggregateType.Widget,
-            lastEvents: {
+            last_events: {
               1: {
                 created: new Date('2022-01-02T00:00:00.000Z').toISOString(),
                 name: DomainEventName.WidgetCreated,

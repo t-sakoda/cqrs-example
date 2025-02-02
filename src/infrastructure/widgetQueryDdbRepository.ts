@@ -47,27 +47,26 @@ export class WidgetQueryDdbRepository implements IWidgetQueryRepository {
     item: Record<string, unknown>,
   ): Promise<WidgetDTO> {
     // lastEventsを取得
-    const {PK: aggregateId, lastEvents} = item as {
+    const {PK: aggregateId, last_events: lastEvents} = item as {
       PK: string
-      lastEvents: Record<number, unknown>
+      last_events: Record<number, unknown>
     }
 
     // lastEventsをEventテーブルに永続化
     for (const [version, _event] of Object.entries(lastEvents ?? {})) {
-      const event = _event as {
-        createdAt: string
+      const params = _event as {
+        created: string
         name: DomainEventName
         payload: Record<string, unknown>
       }
-      await this.eventRepository.saveEvent(
-        new DomainEvent({
-          aggregateId,
-          createdAt: event.createdAt,
-          name: event.name,
-          payload: event.payload,
-          version: Number(version),
-        }),
-      )
+      const event = new DomainEvent({
+        aggregateId,
+        createdAt: params.created,
+        name: params.name,
+        payload: params.payload,
+        version: Number(version),
+      })
+      await this.eventRepository.saveEvent(event)
     }
 
     const widget = new Widget({
