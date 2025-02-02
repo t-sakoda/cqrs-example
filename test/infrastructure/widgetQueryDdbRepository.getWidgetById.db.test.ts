@@ -41,9 +41,9 @@ describe('WidgetQueryDdbRepository.getWidgetById', () => {
           PK: aggregateId,
           created: createdAt,
           type: AggregateType.Widget,
-          lastEvents: {
+          last_events: {
             1: {
-              createdAt: createdAt,
+              created: createdAt,
               name: DomainEventName.WidgetCreated,
               payload: {
                 name: 'Widget 1',
@@ -86,7 +86,7 @@ describe('WidgetQueryDdbRepository.getWidgetById', () => {
                   PK: aggregateId,
                   created: createdAt1,
                   type: AggregateType.Widget,
-                  lastEvents: {
+                  last_events: {
                     2: {
                       createdAt: createdAt3,
                       name: DomainEventName.WidgetNameChanged,
@@ -154,9 +154,9 @@ describe('WidgetQueryDdbRepository.getWidgetById', () => {
                   PK: aggregateId,
                   created: createdAt1,
                   type: AggregateType.Widget,
-                  lastEvents: {
+                  last_events: {
                     3: {
-                      createdAt: createdAt3,
+                      created: createdAt3,
                       name: DomainEventName.WidgetDescriptionChanged,
                       payload: {
                         name: 'Widget One',
@@ -176,7 +176,7 @@ describe('WidgetQueryDdbRepository.getWidgetById', () => {
                 Item: {
                   PK: aggregateId,
                   SK: 1,
-                  createdAt: createdAt2,
+                  created: createdAt2,
                   name: DomainEventName.WidgetNameChanged,
                   payload: {
                     name: 'Widget One',
